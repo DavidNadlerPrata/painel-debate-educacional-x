@@ -1,0 +1,331 @@
+{
+ "source": "Google Trends (geo=BR, pt-BR) — cada termo auto-normalizado 0–100 em query própria",
+ "timeframe": "2024-08-01..2025-07-31",
+ "terms": [
+  "Pé-de-Meia",
+  "ENEM",
+  "SISU"
+ ],
+ "granularity": "weekly",
+ "fetched": "2026-07-25",
+ "data": [
+  {
+   "date": "2024-07-28",
+   "Pé-de-Meia": 20,
+   "ENEM": 9,
+   "SISU": 1
+  },
+  {
+   "date": "2024-08-04",
+   "Pé-de-Meia": 14,
+   "ENEM": 10,
+   "SISU": 1
+  },
+  {
+   "date": "2024-08-11",
+   "Pé-de-Meia": 11,
+   "ENEM": 13,
+   "SISU": 1
+  },
+  {
+   "date": "2024-08-18",
+   "Pé-de-Meia": 19,
+   "ENEM": 14,
+   "SISU": 1
+  },
+  {
+   "date": "2024-08-25",
+   "Pé-de-Meia": 26,
+   "ENEM": 12,
+   "SISU": 1
+  },
+  {
+   "date": "2024-09-01",
+   "Pé-de-Meia": 15,
+   "ENEM": 11,
+   "SISU": 1
+  },
+  {
+   "date": "2024-09-08",
+   "Pé-de-Meia": 8,
+   "ENEM": 12,
+   "SISU": 1
+  },
+  {
+   "date": "2024-09-15",
+   "Pé-de-Meia": 12,
+   "ENEM": 11,
+   "SISU": 1
+  },
+  {
+   "date": "2024-09-22",
+   "Pé-de-Meia": 32,
+   "ENEM": 12,
+   "SISU": 1
+  },
+  {
+   "date": "2024-09-29",
+   "Pé-de-Meia": 24,
+   "ENEM": 14,
+   "SISU": 1
+  },
+  {
+   "date": "2024-10-06",
+   "Pé-de-Meia": 11,
+   "ENEM": 14,
+   "SISU": 1
+  },
+  {
+   "date": "2024-10-13",
+   "Pé-de-Meia": 13,
+   "ENEM": 20,
+   "SISU": 1
+  },
+  {
+   "date": "2024-10-20",
+   "Pé-de-Meia": 24,
+   "ENEM": 48,
+   "SISU": 2
+  },
+  {
+   "date": "2024-10-27",
+   "Pé-de-Meia": 27,
+   "ENEM": 65,
+   "SISU": 3
+  },
+  {
+   "date": "2024-11-03",
+   "Pé-de-Meia": 17,
+   "ENEM": 100,
+   "SISU": 4
+  },
+  {
+   "date": "2024-11-10",
+   "Pé-de-Meia": 13,
+   "ENEM": 47,
+   "SISU": 4
+  },
+  {
+   "date": "2024-11-17",
+   "Pé-de-Meia": 16,
+   "ENEM": 10,
+   "SISU": 2
+  },
+  {
+   "date": "2024-11-24",
+   "Pé-de-Meia": 19,
+   "ENEM": 9,
+   "SISU": 2
+  },
+  {
+   "date": "2024-12-01",
+   "Pé-de-Meia": 21,
+   "ENEM": 6,
+   "SISU": 2
+  },
+  {
+   "date": "2024-12-08",
+   "Pé-de-Meia": 19,
+   "ENEM": 6,
+   "SISU": 2
+  },
+  {
+   "date": "2024-12-15",
+   "Pé-de-Meia": 24,
+   "ENEM": 6,
+   "SISU": 2
+  },
+  {
+   "date": "2024-12-22",
+   "Pé-de-Meia": 19,
+   "ENEM": 5,
+   "SISU": 3
+  },
+  {
+   "date": "2024-12-29",
+   "Pé-de-Meia": 16,
+   "ENEM": 8,
+   "SISU": 4
+  },
+  {
+   "date": "2025-01-05",
+   "Pé-de-Meia": 17,
+   "ENEM": 13,
+   "SISU": 5
+  },
+  {
+   "date": "2025-01-12",
+   "Pé-de-Meia": 37,
+   "ENEM": 79,
+   "SISU": 100
+  },
+  {
+   "date": "2025-01-19",
+   "Pé-de-Meia": 36,
+   "ENEM": 16,
+   "SISU": 83
+  },
+  {
+   "date": "2025-01-26",
+   "Pé-de-Meia": 36,
+   "ENEM": 14,
+   "SISU": 88
+  },
+  {
+   "date": "2025-02-02",
+   "Pé-de-Meia": 30,
+   "ENEM": 11,
+   "SISU": 11
+  },
+  {
+   "date": "2025-02-09",
+   "Pé-de-Meia": 34,
+   "ENEM": 11,
+   "SISU": 17
+  },
+  {
+   "date": "2025-02-16",
+   "Pé-de-Meia": 85,
+   "ENEM": 11,
+   "SISU": 10
+  },
+  {
+   "date": "2025-02-23",
+   "Pé-de-Meia": 100,
+   "ENEM": 9,
+   "SISU": 5
+  },
+  {
+   "date": "2025-03-02",
+   "Pé-de-Meia": 43,
+   "ENEM": 8,
+   "SISU": 4
+  },
+  {
+   "date": "2025-03-09",
+   "Pé-de-Meia": 32,
+   "ENEM": 25,
+   "SISU": 4
+  },
+  {
+   "date": "2025-03-16",
+   "Pé-de-Meia": 29,
+   "ENEM": 15,
+   "SISU": 3
+  },
+  {
+   "date": "2025-03-23",
+   "Pé-de-Meia": 43,
+   "ENEM": 11,
+   "SISU": 3
+  },
+  {
+   "date": "2025-03-30",
+   "Pé-de-Meia": 39,
+   "ENEM": 11,
+   "SISU": 2
+  },
+  {
+   "date": "2025-04-06",
+   "Pé-de-Meia": 26,
+   "ENEM": 11,
+   "SISU": 2
+  },
+  {
+   "date": "2025-04-13",
+   "Pé-de-Meia": 22,
+   "ENEM": 26,
+   "SISU": 2
+  },
+  {
+   "date": "2025-04-20",
+   "Pé-de-Meia": 30,
+   "ENEM": 27,
+   "SISU": 2
+  },
+  {
+   "date": "2025-04-27",
+   "Pé-de-Meia": 32,
+   "ENEM": 15,
+   "SISU": 1
+  },
+  {
+   "date": "2025-05-04",
+   "Pé-de-Meia": 27,
+   "ENEM": 12,
+   "SISU": 1
+  },
+  {
+   "date": "2025-05-11",
+   "Pé-de-Meia": 21,
+   "ENEM": 18,
+   "SISU": 1
+  },
+  {
+   "date": "2025-05-18",
+   "Pé-de-Meia": 30,
+   "ENEM": 14,
+   "SISU": 1
+  },
+  {
+   "date": "2025-05-25",
+   "Pé-de-Meia": 24,
+   "ENEM": 38,
+   "SISU": 1
+  },
+  {
+   "date": "2025-06-01",
+   "Pé-de-Meia": 19,
+   "ENEM": 39,
+   "SISU": 1
+  },
+  {
+   "date": "2025-06-08",
+   "Pé-de-Meia": 16,
+   "ENEM": 22,
+   "SISU": 1
+  },
+  {
+   "date": "2025-06-15",
+   "Pé-de-Meia": 23,
+   "ENEM": 13,
+   "SISU": 1
+  },
+  {
+   "date": "2025-06-22",
+   "Pé-de-Meia": 22,
+   "ENEM": 11,
+   "SISU": 1
+  },
+  {
+   "date": "2025-06-29",
+   "Pé-de-Meia": 17,
+   "ENEM": 12,
+   "SISU": 1
+  },
+  {
+   "date": "2025-07-06",
+   "Pé-de-Meia": 18,
+   "ENEM": 11,
+   "SISU": 1
+  },
+  {
+   "date": "2025-07-13",
+   "Pé-de-Meia": 26,
+   "ENEM": 10,
+   "SISU": 1
+  },
+  {
+   "date": "2025-07-20",
+   "Pé-de-Meia": 69,
+   "ENEM": 9,
+   "SISU": 1
+  },
+  {
+   "date": "2025-07-27",
+   "Pé-de-Meia": 35,
+   "ENEM": 10,
+   "SISU": 1
+  }
+ ]
+}

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="PoC do painel de monitoramento (Cap. 7) da tese de Leonardo Barchini: especificacao situada do alvo (FEA) e deslocamento de alvo.">
-<title>Painel PoC — Inteligência Social no Debate Educacional no X</title>
+<meta name="description" content="Painel de monitoramento (Cap. 7) da tese de Leonardo Barchini — série real do Google Trends e eventos-âncora reais; especificação situada do alvo (FEA).">
+<title>Painel — Inteligência Social no Debate Educacional (dados reais)</title>
 <style>
   :root{
     color-scheme: light;
@@ -12,9 +12,10 @@
     --ink:#14161f; --ink-2:#484c60; --muted:#7b8098;
     --line:#e2e4ee; --line-2:#cfd2e0;
     --brand:#3a4db0; --brand-strong:#2b3a8f; --brand-soft:#e9ebf8; --brand-ink:#2b3a8f;
+    --enem:#2a78d6; --pdm:#eb6834; --sisu:#1baf7a;
     --fav:#1f9d57; --con:#d6453f; --neu:#8a8fa6; --mis:#d6970f; --gov:#6b4bbd;
     --fav-soft:#e4f4ea; --con-soft:#fbe8e6; --mis-soft:#faf0d9; --gov-soft:#eee9fa;
-    --good:#0ca30c; --warn:#e0951a; --crit:#d03b3b;
+    --real:#0f8a52; --real-soft:#e3f3ea; --est:#b3760a; --est-soft:#f9efd8;
     --shadow:0 1px 2px rgba(20,22,31,.05), 0 8px 24px -12px rgba(20,22,31,.16);
     --radius:14px; --radius-sm:9px;
     --mono:ui-monospace,"SFMono-Regular","Cascadia Code","Consolas",monospace;
@@ -27,9 +28,10 @@
       --ink:#f1f2f8; --ink-2:#b7bbcd; --muted:#868ba2;
       --line:#282b38; --line-2:#343849;
       --brand:#8090f2; --brand-strong:#a3aefa; --brand-soft:#20233a; --brand-ink:#aab3fb;
+      --enem:#3987e5; --pdm:#d95926; --sisu:#199e70;
       --fav:#37b56f; --con:#e56a63; --neu:#9297ae; --mis:#e6b23c; --gov:#9885e9;
       --fav-soft:#14281d; --con-soft:#2c1817; --mis-soft:#2a2210; --gov-soft:#201a34;
-      --good:#2fbf2f; --warn:#f0b53a; --crit:#e05656;
+      --real:#31b46f; --real-soft:#14281d; --est:#e6b23c; --est-soft:#2a2210;
       --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.6);
     }
   }
@@ -39,12 +41,12 @@
     --ink:#f1f2f8; --ink-2:#b7bbcd; --muted:#868ba2;
     --line:#282b38; --line-2:#343849;
     --brand:#8090f2; --brand-strong:#a3aefa; --brand-soft:#20233a; --brand-ink:#aab3fb;
+    --enem:#3987e5; --pdm:#d95926; --sisu:#199e70;
     --fav:#37b56f; --con:#e56a63; --neu:#9297ae; --mis:#e6b23c; --gov:#9885e9;
     --fav-soft:#14281d; --con-soft:#2c1817; --mis-soft:#2a2210; --gov-soft:#201a34;
-    --good:#2fbf2f; --warn:#f0b53a; --crit:#e05656;
+    --real:#31b46f; --real-soft:#14281d; --est:#e6b23c; --est-soft:#2a2210;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.6);
   }
-
   *{box-sizing:border-box}
   body{margin:0;background:var(--page);color:var(--ink);font-family:var(--sans);
     -webkit-font-smoothing:antialiased;line-height:1.5;font-size:15px}
@@ -55,11 +57,8 @@
     text-wrap:balance;font-weight:700}
   h2{font-size:15px;letter-spacing:-.01em;margin:0;font-weight:700}
   .sub{color:var(--ink-2);font-size:15px;max-width:64ch;margin:0}
-  .metaline{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:10px;
-    display:flex;gap:14px;flex-wrap:wrap}
+  .metaline{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:10px;display:flex;gap:14px;flex-wrap:wrap}
   .metaline b{color:var(--ink-2);font-weight:600}
-
-  /* top bar */
   .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap}
   .ttoggle{font-family:var(--mono);font-size:11px;letter-spacing:.06em;border:1px solid var(--line-2);
     background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:99px;cursor:pointer;
@@ -67,37 +66,49 @@
   .ttoggle:hover{border-color:var(--brand);color:var(--brand-ink)}
   .ttoggle:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
-    box-shadow:var(--shadow)}
+  /* provenance */
+  .prov{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .prov .p{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:99px;
+    padding:6px 12px;font-size:12px;background:var(--surface)}
+  .prov .p .d{width:8px;height:8px;border-radius:99px}
+  .prov .p b{font-weight:700}
+  .prov .p.real{border-color:color-mix(in srgb,var(--real) 45%,var(--line))}
+  .prov .p.est{border-color:color-mix(in srgb,var(--est) 45%,var(--line))}
+  .chipflag{font-family:var(--mono);font-size:9px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;
+    padding:2px 7px;border-radius:5px;display:inline-flex;gap:4px;align-items:center;white-space:nowrap}
+  .chipflag.real{background:var(--real-soft);color:var(--real)}
+  .chipflag.est{background:var(--est-soft);color:var(--est)}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
   .pad{padding:18px 20px}
   section{margin-top:18px}
   .sechead{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-  .sechead .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--muted)}
+  .sechead .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
   .sechead p{margin:0;color:var(--ink-2);font-size:13px}
 
-  /* KPI */
   .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
   .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px 15px}
-  .kpi .k-label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--muted);line-height:1.3}
-  .kpi .k-val{font-size:26px;font-weight:700;letter-spacing:-.02em;margin-top:7px;font-variant-numeric:tabular-nums}
-  .kpi .k-val small{font-size:14px;font-weight:600;color:var(--ink-2)}
-  .kpi .k-note{font-size:11.5px;color:var(--ink-2);margin-top:3px}
+  .kpi .k-label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);line-height:1.3}
+  .kpi .k-val{font-size:25px;font-weight:700;letter-spacing:-.02em;margin-top:7px;font-variant-numeric:tabular-nums}
+  .kpi .k-val small{font-size:13px;font-weight:600;color:var(--ink-2)}
+  .kpi .k-note{font-size:11px;color:var(--ink-2);margin-top:3px}
   .kpi.accent .k-val{color:var(--brand-ink)}
 
   /* timeline */
-  .tl-wrap{position:relative}
-  .tl-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--ink-2)}
+  .tl-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;font-size:12px;color:var(--ink-2);align-items:center}
   .tl-legend span{display:inline-flex;gap:6px;align-items:center}
-  .dotm{width:9px;height:9px;border-radius:99px;background:var(--brand);border:2px solid var(--surface);
-    box-shadow:0 0 0 1px var(--brand)}
+  .tl-legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+  .tl-legend .ep{width:9px;height:9px;border-radius:99px;background:var(--muted);border:2px solid var(--surface);box-shadow:0 0 0 1px var(--muted)}
+  #tlwrap{position:relative}
+  .tltip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line-2);
+    border-radius:8px;padding:8px 10px;font-size:11.5px;box-shadow:var(--shadow);opacity:0;transition:opacity .1s;z-index:5;min-width:130px}
+  .tltip .dt{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:4px}
+  .tltip .rw{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+  .tltip .rw i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:5px}
 
-  /* chips */
   .chips{display:flex;gap:9px;flex-wrap:wrap}
-  .chip{border:1px solid var(--line-2);background:var(--surface);border-radius:99px;padding:8px 13px;
-    cursor:pointer;font-size:12.5px;color:var(--ink-2);display:inline-flex;gap:9px;align-items:center;
-    transition:border-color .12s, background .12s}
+  .chip{border:1px solid var(--line-2);background:var(--surface);border-radius:99px;padding:8px 13px;cursor:pointer;
+    font-size:12.5px;color:var(--ink-2);display:inline-flex;gap:9px;align-items:center;transition:border-color .12s, background .12s}
   .chip .cid{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
   .chip .cpol{width:8px;height:8px;border-radius:2px}
   .chip:hover{border-color:var(--brand)}
@@ -105,91 +116,68 @@
   .chip[aria-pressed="true"] .cid{color:var(--brand-ink)}
   .chip:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
-  /* episode header */
   .ephead{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-start}
   .ephead .eyid{font-family:var(--mono);font-size:11px;color:var(--brand-ink);letter-spacing:.05em}
   .ephead h3{margin:6px 0 8px;font-size:20px;letter-spacing:-.015em;line-height:1.15;max-width:40ch}
-  .anchor{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);
-    padding:11px 13px;font-size:13px;color:var(--ink-2);max-width:52ch}
-  .anchor .a-lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--muted);display:block;margin-bottom:3px}
-  .anchor .src{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px;display:block}
-  .epstats{display:flex;gap:22px;flex-wrap:wrap}
+  .anchor{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:11px 13px;font-size:13px;color:var(--ink-2);max-width:54ch}
+  .anchor .a-lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px}
+  .anchor .src{font-size:11.5px;margin-top:6px;display:inline-flex;gap:5px;align-items:center}
+  .anchor .src a{color:var(--brand-ink);text-decoration:none;font-family:var(--mono);font-size:11px;word-break:break-all}
+  .anchor .src a:hover{text-decoration:underline}
+  .epstats{display:flex;gap:20px;flex-wrap:wrap}
   .epstat .s-lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-  .epstat .s-val{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+  .epstat .s-val{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
 
-  /* core grid */
   .core{display:grid;grid-template-columns:minmax(0,0.92fr) minmax(0,1.08fr);gap:16px}
-
-  /* FEA card */
   .fea{position:relative;overflow:hidden}
-  .fea .fea-top{display:flex;justify-content:space-between;align-items:center;
-    background:var(--brand);color:#fff;padding:12px 18px}
-  :root[data-theme="dark"] .fea .fea-top,
-  :root:where(:not([data-theme="light"])) .fea .fea-top{color:#0b0c11}
-  @media (prefers-color-scheme: dark){:root:where(:not([data-theme="light"])) .fea .fea-top{color:#0b0c11}}
-  .fea .fea-top .ft-title{font-weight:700;font-size:13.5px;letter-spacing:.01em;display:flex;gap:8px;align-items:center}
-  .fea .fea-top .ver{font-family:var(--mono);font-size:11px;opacity:.9}
+  .fea .fea-top{display:flex;justify-content:space-between;align-items:center;background:var(--brand);color:#fff;padding:12px 18px}
+  .fea .fea-top .ft-title{font-weight:700;font-size:13.5px;display:flex;gap:8px;align-items:center}
+  .fea .fea-top .ver{font-family:var(--mono);font-size:11px;opacity:.92}
   .fea-body{padding:4px 18px 18px}
   .fea-row{padding:12px 0;border-bottom:1px solid var(--line)}
   .fea-row:last-child{border-bottom:none}
-  .fea-row .r-lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;
-    color:var(--muted);margin-bottom:5px}
+  .fea-row .r-lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
   .canon{font-size:15px;font-weight:600;color:var(--ink);line-height:1.3}
   .scope{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .scope .sc{border-radius:8px;padding:9px 11px;font-size:12.5px}
   .scope .in{background:var(--fav-soft)} .scope .out{background:var(--con-soft)}
-  .scope .sc b{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;
-    text-transform:uppercase;margin-bottom:4px;color:var(--ink-2)}
+  .scope .sc b{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--ink-2)}
   .scope ul{margin:0;padding-left:15px} .scope li{margin:2px 0}
   .crit-ex{display:flex;flex-direction:column;gap:7px}
   .crit-ex .ex{display:flex;gap:9px;align-items:flex-start;font-size:12.5px}
-  .crit-ex .ex .badge{font-family:var(--mono);font-size:9px;letter-spacing:.06em;padding:2px 7px;border-radius:5px;
-    flex-shrink:0;margin-top:1px;font-weight:600}
+  .crit-ex .ex .badge{font-family:var(--mono);font-size:9px;letter-spacing:.06em;padding:2px 7px;border-radius:5px;flex-shrink:0;margin-top:1px;font-weight:600}
   .crit-ex .ex .f{background:var(--fav-soft);color:var(--fav)} .crit-ex .ex .c{background:var(--con-soft);color:var(--con)}
   .crit-ex .ex q{color:var(--ink-2);font-style:italic}
   .discarded{display:flex;flex-direction:column;gap:6px}
   .discarded .d{font-size:12px;color:var(--ink-2);display:flex;gap:8px;align-items:baseline}
-  .discarded .d s{color:var(--gov);text-decoration:none;font-weight:600;font-family:var(--mono);
-    font-size:11.5px;white-space:nowrap}
+  .discarded .d s{color:var(--gov);text-decoration:none;font-weight:600;font-family:var(--mono);font-size:11.5px;white-space:nowrap}
   .discarded .d .why{color:var(--muted)}
   .fea-sign{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
 
-  /* comparison */
   .cmp-block{margin-bottom:6px}
   .cmp-lab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
   .cmp-lab .t{font-size:12.5px;font-weight:600}
-  .cmp-lab .t .mono{font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:400;
-    letter-spacing:.06em;text-transform:uppercase;margin-left:7px}
+  .cmp-lab .t .mono{font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:400;letter-spacing:.06em;text-transform:uppercase;margin-left:7px}
   .barstack{display:flex;height:34px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
-  .barstack .seg{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11.5px;
-    font-weight:600;font-variant-numeric:tabular-nums;min-width:0;position:relative}
+  .barstack .seg{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;min-width:0}
   .barstack .seg span{padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .callout{margin-top:14px;background:var(--brand-soft);border:1px solid var(--line-2);border-left:3px solid var(--brand);
-    border-radius:8px;padding:13px 15px}
+  .callout{margin-top:14px;background:var(--brand-soft);border:1px solid var(--line-2);border-left:3px solid var(--brand);border-radius:8px;padding:13px 15px}
   .callout .big{font-size:14px;line-height:1.45}
-  .callout .big b{font-weight:700}
   .callout .arrow{color:var(--brand-ink);font-weight:700}
   .delta-nums{display:flex;gap:26px;margin-top:9px;flex-wrap:wrap}
   .delta-nums .dn .l{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
   .delta-nums .dn .v{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
-
   .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11.5px;color:var(--ink-2)}
   .legend span{display:inline-flex;gap:6px;align-items:center}
   .legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
-
-  /* two-up */
   .twoup{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   .hbars{display:flex;flex-direction:column;gap:11px}
   .hbar{display:grid;grid-template-columns:132px 1fr 42px;align-items:center;gap:10px;font-size:12.5px}
   .hbar .hl{color:var(--ink-2)} .hbar .hv{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
   .track{height:16px;background:var(--surface-3);border-radius:5px;overflow:hidden}
   .track .fill{height:100%;border-radius:5px}
-
-  /* factorial */
   .fac{position:relative}
-  .fac .goldline{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-bottom:10px;
-    display:flex;gap:7px;align-items:center}
+  .fac .goldline{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-bottom:10px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
   .fac .goldline b{color:var(--ink-2)}
   .facrow{display:grid;grid-template-columns:1fr;gap:9px}
   .facbar{display:grid;grid-template-columns:190px 1fr;gap:12px;align-items:center}
@@ -197,39 +185,27 @@
   .facbar .fb-lab .code{font-family:var(--mono);font-weight:700;font-size:12px}
   .facbar .fb-lab .desc{color:var(--muted);font-size:11px;display:block}
   .facbar .fb-track{position:relative;height:26px;background:var(--surface-3);border-radius:6px}
-  .facbar .fb-fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;display:flex;align-items:center;
-    justify-content:flex-end;padding-right:8px;color:#fff;font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums}
+  .facbar .fb-fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#fff;font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums}
   .facbar .fb-f1{font-family:var(--mono);font-size:11px;color:var(--ink-2);white-space:nowrap}
   .fb-fill.method{background:var(--brand)} .fb-fill.base{background:var(--neu)}
-  .goldmark{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--good);z-index:3}
-  .goldmark::after{content:"gold";position:absolute;top:-14px;left:50%;transform:translateX(-50%);
-    font-family:var(--mono);font-size:9px;color:var(--good);white-space:nowrap}
-
-  /* table */
+  .goldmark{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--fav);z-index:3}
+  .goldmark::after{content:"gold";position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;color:var(--fav);white-space:nowrap}
   .tbl-scroll{overflow-x:auto}
-  table.bt{width:100%;border-collapse:collapse;font-size:12.5px;min-width:640px}
-  table.bt th,table.bt td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
-  table.bt th{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--muted);font-weight:600}
+  table.bt{width:100%;border-collapse:collapse;font-size:12.5px;min-width:720px}
+  table.bt th,table.bt td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.bt th{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
   table.bt td.num{font-variant-numeric:tabular-nums;font-family:var(--mono);text-align:right}
   table.bt tr[data-jump]{cursor:pointer}
   table.bt tr[data-jump]:hover td{background:var(--surface-2)}
   table.bt .code{font-family:var(--mono);font-size:11px;color:var(--brand-ink)}
-  .pill{display:inline-flex;gap:5px;align-items:center;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
-  .pill.ok{background:var(--fav-soft);color:var(--fav)} .pill.part{background:var(--mis-soft);color:var(--mis)}
-
+  table.bt a{color:var(--brand-ink);font-family:var(--mono);font-size:10.5px}
   details.data{margin-top:12px;font-size:12.5px}
-  details.data summary{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--brand-ink);
-    cursor:pointer}
+  details.data summary{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--brand-ink);cursor:pointer}
   details.data table{width:100%;border-collapse:collapse;margin-top:8px;font-variant-numeric:tabular-nums}
   details.data td,details.data th{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left}
-
-  .foot{margin-top:26px;border-top:1px solid var(--line);padding-top:16px;font-size:12px;color:var(--muted);
-    display:flex;flex-direction:column;gap:6px}
-  .foot .note{max-width:82ch}
-  .foot .warn-tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--warn);border:1px solid var(--warn);border-radius:5px;padding:2px 8px;display:inline-block}
-
+  .foot{margin-top:26px;border-top:1px solid var(--line);padding-top:16px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+  .foot .note{max-width:84ch}
+  .foot a{color:var(--brand-ink)}
   svg text{font-family:var(--sans)}
   @media (max-width:860px){
     .kpis{grid-template-columns:repeat(2,1fr)}
@@ -246,58 +222,62 @@
 <div class="wrap">
   <div class="topbar">
     <div>
-      <div class="eyebrow">Prova de conceito · Cap.&nbsp;7 — da ficha ao painel</div>
-      <h1>Inteligência Social no Debate Educacional no X</h1>
-      <p class="sub">Painel de monitoramento orientado a eventos com <b>especificação situada do alvo</b>. Cada pico
-        vira um episódio; cada episódio recebe uma <b>Ficha de Especificação de Alvo (FEA)</b> — e só então os
-        indicadores de apoio, crítica e rejeição passam a ter validade.</p>
+      <div class="eyebrow">Cap. 7 — da ficha ao painel · versão com dados reais</div>
+      <h1>Inteligência Social no Debate Educacional</h1>
+      <p class="sub">Painel de monitoramento orientado a eventos. A série temporal e os episódios são <b>reais</b> —
+        interesse de busca do Google Trends e eventos-âncora com fonte citável. O <b>posicionamento</b> permanece
+        estimado até a construção do corpus anotado.</p>
       <div class="metaline">
-        <span><b>PPGGTD/UFT</b> · Doutorado Profissional</span>
-        <span>Tese <b>Leonardo Barchini</b></span>
+        <span><b>PPGGTD/UFT</b></span><span>Tese <b>Leonardo Barchini</b></span>
         <span>Orient. <b>David Nadler Prata</b></span>
+      </div>
+      <div class="prov">
+        <span class="p real"><span class="d" style="background:var(--real)"></span><b>Série temporal:</b>&nbsp;real · Google Trends (BR)</span>
+        <span class="p real"><span class="d" style="background:var(--real)"></span><b>Episódios e datas:</b>&nbsp;reais · fontes citadas</span>
+        <span class="p est"><span class="d" style="background:var(--est)"></span><b>Posicionamento:</b>&nbsp;estimado · aguarda corpus</span>
       </div>
     </div>
     <button class="ttoggle" id="themeBtn" aria-label="Alternar tema">◐ tema</button>
   </div>
 
-  <!-- KPIs -->
   <section aria-label="Indicadores gerais">
     <div class="kpis">
-      <div class="kpi"><div class="k-label">Menções ao MEC · 12 meses</div>
-        <div class="k-val">2,41<small> mi</small></div><div class="k-note">plataforma X · V-Tracker</div></div>
-      <div class="kpi"><div class="k-label">Episódios de alta intensidade</div>
-        <div class="k-val">7</div><div class="k-note">detecção por rajada (Kleinberg)</div></div>
-      <div class="kpi accent"><div class="k-label">Deslocamento de alvo médio</div>
-        <div class="k-val">26<small>%</small></div><div class="k-note">alvo efetivo ≠ política nominal</div></div>
-      <div class="kpi"><div class="k-label">Latência mediana de alerta</div>
-        <div class="k-val">2,5<small> h</small></div><div class="k-note">backtesting sobre a série</div></div>
-      <div class="kpi accent"><div class="k-label">Ganho de F1 · FEA vs. baseline</div>
-        <div class="k-val">+0,24</div><div class="k-note">estratégia C/D contra A</div></div>
+      <div class="kpi"><div class="k-label">Janela analisada <span class="chipflag real">real</span></div>
+        <div class="k-val">12<small> meses</small></div><div class="k-note">ago/2024 – jul/2025</div></div>
+      <div class="kpi"><div class="k-label">Fonte da série <span class="chipflag real">real</span></div>
+        <div class="k-val" style="font-size:19px">Google Trends</div><div class="k-note">interesse de busca · BR</div></div>
+      <div class="kpi accent"><div class="k-label">Picos caracterizados</div>
+        <div class="k-val">5<small> / 6</small></div><div class="k-note">1 pico com FEA pendente</div></div>
+      <div class="kpi"><div class="k-label">Pico máx. Pé-de-Meia <span class="chipflag real">real</span></div>
+        <div class="k-val">100</div><div class="k-note">semana de 23/fev/2025</div></div>
+      <div class="kpi accent"><div class="k-label">Deslocamento médio <span class="chipflag est">est.</span></div>
+        <div class="k-val">25<small>%</small></div><div class="k-note">alvo efetivo ≠ política nominal</div></div>
     </div>
   </section>
 
-  <!-- Timeline -->
-  <section aria-label="Linha do tempo de menções">
+  <section aria-label="Série do Google Trends">
     <div class="sechead">
-      <h2>Série de menções e episódios detectados</h2>
-      <span class="tag">jul/2025 → jun/2026</span>
-      <p>Clique num pico para carregar o episódio.</p>
+      <h2>Interesse de busca e episódios detectados</h2>
+      <span class="tag">Google Trends · Brasil · semanal</span>
+      <span class="chipflag real">dado real</span>
+      <p style="width:100%">Cada termo é normalizado 0–100 na própria série. Clique num marcador para carregar o episódio.</p>
     </div>
-    <div class="card pad tl-wrap">
-      <div id="timeline"></div>
+    <div class="card pad">
+      <div id="tlwrap">
+        <div id="timeline"></div>
+        <div class="tltip" id="tltip"></div>
+      </div>
       <div class="tl-legend">
-        <span><i class="dotm"></i> episódio ancorado (evento externo verificável)</span>
-        <span style="color:var(--muted)">área = volume semanal de menções</span>
+        <span><i style="background:var(--enem)"></i> ENEM</span>
+        <span><i style="background:var(--pdm)"></i> Pé-de-Meia</span>
+        <span><i style="background:var(--sisu)"></i> SISU</span>
+        <span style="margin-left:auto;color:var(--muted)"><span class="ep"></span> episódio ancorado em evento verificável</span>
       </div>
     </div>
   </section>
 
-  <!-- Chips -->
-  <section aria-label="Seleção de episódio">
-    <div class="chips" id="chips" role="tablist"></div>
-  </section>
+  <section aria-label="Seleção de episódio"><div class="chips" id="chips" role="tablist"></div></section>
 
-  <!-- Episode header -->
   <section>
     <div class="card pad">
       <div class="ephead">
@@ -305,144 +285,98 @@
           <div class="eyid" id="ep-id">—</div>
           <h3 id="ep-title">—</h3>
           <div class="anchor">
-            <span class="a-lab">Evento âncora</span>
+            <span class="a-lab">Evento âncora <span class="chipflag real">real</span></span>
             <span id="ep-anchor">—</span>
-            <span class="src" id="ep-src">—</span>
+            <span class="src">↳ <a id="ep-src" href="#" target="_blank" rel="noopener">—</a></span>
           </div>
         </div>
         <div class="epstats">
           <div class="epstat"><div class="s-lab">Janela</div><div class="s-val" id="ep-window">—</div></div>
-          <div class="epstat"><div class="s-lab">Volume</div><div class="s-val" id="ep-vol">—</div></div>
-          <div class="epstat"><div class="s-lab">Latência</div><div class="s-val" id="ep-lat">—</div></div>
-          <div class="epstat"><div class="s-lab">Política nominal</div><div class="s-val" id="ep-pol">—</div></div>
+          <div class="epstat"><div class="s-lab">Pico Trends</div><div class="s-val" id="ep-peak">—</div></div>
+          <div class="epstat"><div class="s-lab">Política</div><div class="s-val" id="ep-pol">—</div></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Core: FEA vs comparison -->
   <section>
     <div class="core">
-      <!-- FEA -->
       <div class="card fea">
-        <div class="fea-top">
-          <span class="ft-title">🎯 Ficha de Especificação de Alvo</span>
-          <span class="ver" id="fea-ver">v1.0</span>
-        </div>
+        <div class="fea-top"><span class="ft-title">🎯 Ficha de Especificação de Alvo</span><span class="ver" id="fea-ver">v1.0</span></div>
         <div class="fea-body">
-          <div class="fea-row">
-            <div class="r-lab">Formulação canônica do alvo</div>
-            <div class="canon" id="fea-canon">—</div>
-          </div>
-          <div class="fea-row">
-            <div class="r-lab">Escopo do alvo</div>
+          <div class="fea-row"><div class="r-lab">Formulação canônica do alvo</div><div class="canon" id="fea-canon">—</div></div>
+          <div class="fea-row"><div class="r-lab">Escopo do alvo</div>
             <div class="scope">
               <div class="sc in"><b>Dentro</b><ul id="fea-in"></ul></div>
               <div class="sc out"><b>Fora</b><ul id="fea-out"></ul></div>
-            </div>
-          </div>
-          <div class="fea-row">
-            <div class="r-lab">Critérios de posicionamento · exemplos-âncora</div>
-            <div class="crit-ex" id="fea-crit"></div>
-          </div>
-          <div class="fea-row">
-            <div class="r-lab">Alvos concorrentes descartados <span style="text-transform:none;letter-spacing:0;color:var(--muted)">— torna a decisão auditável</span></div>
-            <div class="discarded" id="fea-disc"></div>
-          </div>
-          <div class="fea-row">
-            <div class="fea-sign">
-              <span>Analista: <b id="fea-analyst" style="color:var(--ink-2)">—</b></span>
-              <span id="fea-date">—</span>
-              <span>episódio: <span id="fea-epref" style="color:var(--brand-ink)">—</span></span>
-            </div>
-          </div>
+            </div></div>
+          <div class="fea-row"><div class="r-lab">Critérios de posicionamento · exemplos ilustrativos</div><div class="crit-ex" id="fea-crit"></div></div>
+          <div class="fea-row"><div class="r-lab">Alvos concorrentes descartados <span style="text-transform:none;letter-spacing:0;color:var(--muted)">— torna a decisão auditável</span></div><div class="discarded" id="fea-disc"></div></div>
+          <div class="fea-row"><div class="fea-sign">
+            <span>Analista: <b id="fea-analyst" style="color:var(--ink-2)">—</b></span>
+            <span id="fea-date">—</span><span>episódio: <span id="fea-epref" style="color:var(--brand-ink)">—</span></span>
+          </div></div>
         </div>
       </div>
 
-      <!-- Comparison -->
       <div class="card pad">
-        <div class="sechead" style="margin-bottom:16px">
-          <h2>A mesma multidão, lida de dois modos</h2>
-        </div>
-
+        <div class="sechead" style="margin-bottom:14px"><h2>A mesma multidão, lida de dois modos</h2><span class="chipflag est">posicionamento estimado</span></div>
         <div class="cmp-block">
-          <div class="cmp-lab"><div class="t">Leitura sem alvo <span class="mono">polaridade afetiva · prática de mercado</span></div></div>
+          <div class="cmp-lab"><div class="t">Leitura sem alvo <span class="mono">polaridade · prática de mercado</span></div></div>
           <div class="barstack" id="bar-baseline"></div>
         </div>
         <div class="cmp-block" style="margin-top:16px">
-          <div class="cmp-lab"><div class="t">Leitura com FEA <span class="mono">posicionamento vs. alvo especificado</span></div></div>
+          <div class="cmp-lab"><div class="t">Leitura com FEA <span class="mono">posicionamento vs. alvo</span></div></div>
           <div class="barstack" id="bar-stance"></div>
         </div>
-
         <div class="legend" id="cmp-legend"></div>
-
         <div class="callout">
-          <div class="big">
-            Rejeição aparente <b id="c-appar">—</b> <span class="arrow">→</span>
-            rejeição real ao programa <b id="c-real">—</b>.
-            <span id="c-desc">—</span> das manifestações têm alvo diferente da política nominal.
-          </div>
+          <div class="big">Rejeição aparente <b id="c-appar">—</b> <span class="arrow">→</span>
+            rejeição real ao programa <b id="c-real">—</b>. <b id="c-desc">—</b> das manifestações têm alvo diferente da política nominal.</div>
           <div class="delta-nums">
-            <div class="dn"><div class="l">Δ indicador de rejeição</div><div class="v" id="c-delta" style="color:var(--fav)">—</div></div>
+            <div class="dn"><div class="l">Δ indicador de rejeição</div><div class="v" id="c-delta">—</div></div>
             <div class="dn"><div class="l">Favorável ao alvo</div><div class="v" id="c-fav" style="color:var(--fav)">—</div></div>
             <div class="dn"><div class="l">Deslocamento de alvo</div><div class="v" id="c-desloc" style="color:var(--gov)">—</div></div>
           </div>
         </div>
-
-        <details class="data">
-          <summary>Ver tabela de dados do episódio</summary>
-          <div id="data-table"></div>
-        </details>
+        <details class="data"><summary>Ver tabela de dados do episódio</summary><div id="data-table"></div></details>
       </div>
     </div>
   </section>
 
-  <!-- Deslocamento -->
   <section>
     <div class="card pad">
-      <div class="sechead">
-        <h2>Para onde vai a massa de manifestações</h2>
-        <span class="tag">decomposição do alvo efetivo</span>
-        <p>O que a polaridade contava como um bloco único, a FEA separa por alvo real.</p>
-      </div>
+      <div class="sechead"><h2>Para onde vai a massa de manifestações</h2>
+        <span class="tag">decomposição do alvo efetivo</span><span class="chipflag est">estimado</span>
+        <p style="width:100%">O que a polaridade contava como um bloco único, a FEA separa por alvo real.</p></div>
       <div class="barstack" id="bar-desloc" style="height:40px"></div>
       <div class="legend" id="desloc-legend"></div>
     </div>
   </section>
 
-  <!-- two up -->
   <section>
     <div class="twoup">
       <div class="card pad">
-        <div class="sechead"><h2>Tipologia da crítica</h2><span class="tag">entre as manifestações contrárias</span></div>
-        <p class="sub" style="font-size:12.5px;margin-bottom:14px">Substitui a classificação ideológica: entrega ao MEC a informação
-          acionável — o que pede resposta técnica e o que não pede resposta alguma.</p>
+        <div class="sechead"><h2>Tipologia da crítica</h2><span class="chipflag est">estimado</span></div>
+        <p class="sub" style="font-size:12.5px;margin-bottom:14px">Substitui a classificação ideológica: separa o que pede resposta técnica do que não pede resposta alguma.</p>
         <div class="hbars" id="critica"></div>
       </div>
-
       <div class="card pad fac">
-        <div class="sechead"><h2>Experimento fatorial</h2><span class="tag">efeito da definição do alvo</span></div>
-        <p class="sub" style="font-size:12.5px;margin-bottom:14px">Quatro estratégias de definição do alvo, classificadores
-          constantes. O indicador de rejeição agregado — o que o Ministério lê — muda radicalmente com a estratégia.</p>
-        <div class="goldline">Barra = <b>indicador de rejeição agregado</b> · marca verde = gold standard anotado · à direita, F1-macro.</div>
+        <div class="sechead"><h2>Experimento fatorial</h2><span class="chipflag est">simulado</span></div>
+        <p class="sub" style="font-size:12.5px;margin-bottom:14px">Quatro estratégias de definição do alvo, classificadores constantes. O indicador de rejeição agregado muda radicalmente com a estratégia.</p>
+        <div class="goldline">Barra = <b>indicador de rejeição agregado</b> · marca verde = gold standard · à direita, F1-macro.</div>
         <div class="facrow" id="factorial"></div>
       </div>
     </div>
   </section>
 
-  <!-- Backtesting -->
   <section>
     <div class="card pad">
-      <div class="sechead"><h2>Backtesting sobre a série histórica</h2>
-        <span class="tag">modo simulado de tempo real</span>
-        <p>O passado tem gabarito: sabe-se qual foi a crise, quando começou e o que a gerou.</p></div>
+      <div class="sechead"><h2>Episódios reais detectados na série</h2>
+        <span class="tag">ago/2024 – jul/2025</span><span class="chipflag real">datas e fontes reais</span></div>
       <div class="tbl-scroll">
         <table class="bt">
-          <thead><tr>
-            <th>Episódio</th><th>Evento âncora</th><th>Política</th>
-            <th style="text-align:right">Volume</th><th style="text-align:right">Latência</th>
-            <th style="text-align:right">Desloc.</th><th>Acerto de alvo</th>
-          </tr></thead>
+          <thead><tr><th>Episódio</th><th>Evento âncora (real)</th><th>Data</th><th style="text-align:right">Pico Trends</th><th style="text-align:right">Desloc. (est.)</th><th>Fonte</th></tr></thead>
           <tbody id="bt-body"></tbody>
         </table>
       </div>
@@ -450,335 +384,264 @@
   </section>
 
   <div class="foot">
-    <div><span class="warn-tag">Dados sintéticos · protótipo</span></div>
-    <div class="note">Protótipo de demonstração do Capítulo 7. Volumes, percentuais e fichas são ilustrativos, construídos
-      para exibir o comportamento do método; não representam medições reais. A avaliação de utilidade com a equipe de
-      comunicação do MEC e o corpus anotado de referência substituem estes valores na versão final.</div>
-    <div class="note"><b>Governança:</b> análise sempre agregada · vedado o perfilamento individual e qualquer inferência
-      sobre pessoas naturais identificáveis · minimização e pseudonimização desde a coleta · base legal e finalidade
-      explícitas sob a LGPD. O painel diz o que o debate mostra sobre políticas, não sobre pessoas.</div>
+    <div><span class="chipflag real">real</span> &nbsp;<span class="chipflag est">estimado</span></div>
+    <div class="note"><b>Proveniência.</b> Série temporal: Google Trends (Brasil, pt-BR), cada termo auto-normalizado 0–100,
+      coleta semanal de ago/2024 a jul/2025 (arquivo <code>trends_data.json</code>). Episódios, datas e eventos-âncora:
+      reais, com fonte oficial ou de imprensa citada em cada ficha. Indicadores de posicionamento, deslocamento de alvo,
+      tipologia da crítica e experimento fatorial: <b>estimativas ilustrativas</b> — dependem do corpus anotado de
+      referência, ainda a construir. Substituem-se por medições reais quando a coleta do X (via V-Tracker) e a anotação
+      estiverem concluídas.</div>
+    <div class="note"><b>Governança:</b> análise sempre agregada · vedado o perfilamento individual · minimização e
+      pseudonimização desde a coleta · finalidade explícita sob a LGPD. O painel diz o que o debate mostra sobre
+      políticas, não sobre pessoas.</div>
   </div>
 </div>
 
 <script>
-const EPS = [
- {id:"EP-2025-08-ENEM-01", week:6, pol:"ENEM", title:"Novo modelo de redação anunciado no edital do ENEM 2025",
-  anchor:"Publicação do edital do ENEM 2025 com mudança nos critérios da redação.",
-  src:"Fonte: INEP · Edital nº 47/2025 · 12/08/2025", window:"11–15 ago 2025", vol:47900, lat:5.5,
-  fea:{ver:"v1.1", analyst:"L. Barchini", date:"18/08/2025",
-    canon:"As mudanças no modelo de redação anunciadas no edital do ENEM 2025",
-    scin:["critérios da redação","competências avaliadas","transição de formato"],
-    scout:["dificuldade geral do exame","governo federal","cursinhos e mercado"],
-    crit:[{t:"f",q:"Enfim tiraram aquela fórmula decoreba, era hora"},{t:"c",q:"Mudar regra a meses da prova é sacanagem com quem estuda"}],
-    disc:[["o ENEM como um todo","o pico é sobre a redação, não sobre a prova inteira"],["o governo","não há menção majoritária ao Executivo"]]},
-  baseline:{neg:53,neu:29,pos:18}, stance:{con:22,mis:19,neu:33,fav:26},
-  desloc:{prog:25,gov:12,cel:24,neu:34,ruido:5, pct:12},
-  critica:{operacional:30,distributiva:18,merito:40,politico:12},
-  fac:[{k:"A",d:"genérico fixo (“ENEM”)",rej:40,f1:0.57,base:1},{k:"B",d:"mensagem isolada (OTSD)",rej:33,f1:0.64,base:1},
-       {k:"C",d:"analista + FEA",rej:22,f1:0.80,base:0},{k:"D",d:"LLM + FEA",rej:24,f1:0.77,base:0}], gold:22,
-  bt:{acerto:"ok"}},
+const TRENDS=[{"date":"2024-07-28","pdm":20,"enem":9,"sisu":1},{"date":"2024-08-04","pdm":14,"enem":10,"sisu":1},{"date":"2024-08-11","pdm":11,"enem":13,"sisu":1},{"date":"2024-08-18","pdm":19,"enem":14,"sisu":1},{"date":"2024-08-25","pdm":26,"enem":12,"sisu":1},{"date":"2024-09-01","pdm":15,"enem":11,"sisu":1},{"date":"2024-09-08","pdm":8,"enem":12,"sisu":1},{"date":"2024-09-15","pdm":12,"enem":11,"sisu":1},{"date":"2024-09-22","pdm":32,"enem":12,"sisu":1},{"date":"2024-09-29","pdm":24,"enem":14,"sisu":1},{"date":"2024-10-06","pdm":11,"enem":14,"sisu":1},{"date":"2024-10-13","pdm":13,"enem":20,"sisu":1},{"date":"2024-10-20","pdm":24,"enem":48,"sisu":2},{"date":"2024-10-27","pdm":27,"enem":65,"sisu":3},{"date":"2024-11-03","pdm":17,"enem":100,"sisu":4},{"date":"2024-11-10","pdm":13,"enem":47,"sisu":4},{"date":"2024-11-17","pdm":16,"enem":10,"sisu":2},{"date":"2024-11-24","pdm":19,"enem":9,"sisu":2},{"date":"2024-12-01","pdm":21,"enem":6,"sisu":2},{"date":"2024-12-08","pdm":19,"enem":6,"sisu":2},{"date":"2024-12-15","pdm":24,"enem":6,"sisu":2},{"date":"2024-12-22","pdm":19,"enem":5,"sisu":3},{"date":"2024-12-29","pdm":16,"enem":8,"sisu":4},{"date":"2025-01-05","pdm":17,"enem":13,"sisu":5},{"date":"2025-01-12","pdm":37,"enem":79,"sisu":100},{"date":"2025-01-19","pdm":36,"enem":16,"sisu":83},{"date":"2025-01-26","pdm":36,"enem":14,"sisu":88},{"date":"2025-02-02","pdm":30,"enem":11,"sisu":11},{"date":"2025-02-09","pdm":34,"enem":11,"sisu":17},{"date":"2025-02-16","pdm":85,"enem":11,"sisu":10},{"date":"2025-02-23","pdm":100,"enem":9,"sisu":5},{"date":"2025-03-02","pdm":43,"enem":8,"sisu":4},{"date":"2025-03-09","pdm":32,"enem":25,"sisu":4},{"date":"2025-03-16","pdm":29,"enem":15,"sisu":3},{"date":"2025-03-23","pdm":43,"enem":11,"sisu":3},{"date":"2025-03-30","pdm":39,"enem":11,"sisu":2},{"date":"2025-04-06","pdm":26,"enem":11,"sisu":2},{"date":"2025-04-13","pdm":22,"enem":26,"sisu":2},{"date":"2025-04-20","pdm":30,"enem":27,"sisu":2},{"date":"2025-04-27","pdm":32,"enem":15,"sisu":1},{"date":"2025-05-04","pdm":27,"enem":12,"sisu":1},{"date":"2025-05-11","pdm":21,"enem":18,"sisu":1},{"date":"2025-05-18","pdm":30,"enem":14,"sisu":1},{"date":"2025-05-25","pdm":24,"enem":38,"sisu":1},{"date":"2025-06-01","pdm":19,"enem":39,"sisu":1},{"date":"2025-06-08","pdm":16,"enem":22,"sisu":1},{"date":"2025-06-15","pdm":23,"enem":13,"sisu":1},{"date":"2025-06-22","pdm":22,"enem":11,"sisu":1},{"date":"2025-06-29","pdm":17,"enem":12,"sisu":1},{"date":"2025-07-06","pdm":18,"enem":11,"sisu":1},{"date":"2025-07-13","pdm":26,"enem":10,"sisu":1},{"date":"2025-07-20","pdm":69,"enem":9,"sisu":1},{"date":"2025-07-27","pdm":35,"enem":10,"sisu":1}];
+const SERIES=[{k:"enem",lab:"ENEM",color:"var(--enem)"},{k:"pdm",lab:"Pé-de-Meia",color:"var(--pdm)"},{k:"sisu",lab:"SISU",color:"var(--sisu)"}];
 
- {id:"EP-2025-09-ENEM-02", week:10, pol:"ENEM", title:"Instabilidade na Página do Participante durante as inscrições",
-  anchor:"Falhas de acesso e de geração de GRU no sistema de inscrição do ENEM 2025.",
-  src:"Fonte: relatos + nota do INEP · 24/09/2025", window:"23–26 set 2025", vol:88300, lat:0.9,
-  fea:{ver:"v1.0", analyst:"L. Barchini", date:"25/09/2025",
-    canon:"A instabilidade da Página do Participante durante as inscrições do ENEM 2025",
-    scin:["disponibilidade do sistema","pagamento da GRU","prazo de inscrição"],
-    scout:["conteúdo da prova","política de assistência estudantil","disputa partidária"],
-    crit:[{t:"c",q:"3h tentando pagar e o site cai toda vez, um absurdo"},{t:"f",q:"Prorrogaram o prazo, ainda bem que resolveram"}],
-    disc:[["o governo Lula","falha operacional de sistema, não pauta política"],["a empresa contratada","não identificável na maior parte das menções"]]},
-  baseline:{neg:69,neu:17,pos:14}, stance:{con:59,mis:11,neu:21,fav:9},
-  desloc:{prog:63,gov:18,cel:0,neu:12,ruido:7, pct:18},
-  critica:{operacional:72,distributiva:6,merito:8,politico:14},
-  fac:[{k:"A",d:"genérico fixo (“ENEM”)",rej:64,f1:0.59,base:1},{k:"B",d:"mensagem isolada (OTSD)",rej:61,f1:0.67,base:1},
-       {k:"C",d:"analista + FEA",rej:59,f1:0.83,base:0},{k:"D",d:"LLM + FEA",rej:57,f1:0.80,base:0}], gold:59,
-  bt:{acerto:"ok"}},
+const EPS=[
+ {id:"EP-2024-11-ENEM-01", wi:14, series:"enem", peak:100, pol:"ENEM",
+  title:"Aplicação do ENEM 2024 — 1º e 2º dias de prova",
+  anchor:"Provas do ENEM 2024 aplicadas em 3 e 10 de novembro de 2024; gabarito oficial em 20/11.",
+  srcUrl:"https://agenciabrasil.ebc.com.br/educacao/noticia/2024-05/provas-do-enem-2024-serao-em-3-e-10-de-novembro-confira-o-cronograma",
+  srcLabel:"Agência Brasil — cronograma do ENEM 2024", window:"03–10 nov 2024",
+  fea:{ver:"v1.0",analyst:"L. Barchini",date:"04/11/2024",
+   canon:"A aplicação e a condução do ENEM 2024 pelo INEP nos dias de prova",
+   scin:["logística da aplicação","conteúdo e dificuldade das provas","comunicação do INEP"],
+   scout:["governo federal","reforma do ensino médio","política de cotas"],
+   crit:[{t:"c",q:"Prova gigante, tema de redação polêmico de novo"},{t:"f",q:"Aplicação tranquila aqui, sem atraso, deu tudo certo"}],
+   disc:[["o governo Lula","16% desloca ao Executivo; alvo técnico é o INEP/aplicação"],["a reforma do ensino médio","tema adjacente, fora da janela do pico"]]},
+  baseline:{neg:58,neu:24,pos:18}, stance:{con:41,mis:14,neu:27,fav:18},
+  desloc:{prog:47,gov:16,cel:0,neu:30,ruido:7,pct:16},
+  critica:{operacional:55,distributiva:10,merito:20,politico:15},
+  fac:[{k:"A",d:"genérico fixo (“ENEM”)",rej:52,f1:0.58,base:1},{k:"B",d:"mensagem isolada (OTSD)",rej:45,f1:0.65,base:1},
+       {k:"C",d:"analista + FEA",rej:41,f1:0.81,base:0},{k:"D",d:"LLM + FEA",rej:43,f1:0.78,base:0}], gold:41, acerto:"ok"},
 
- {id:"EP-2025-10-ESUP-01", week:15, pol:"Ensino Superior", title:"Declaração do ministro sobre revisão da política de cotas",
-  anchor:"Fala do ministro, em evento público, sinalizando revisão de critérios de cotas no ensino superior.",
-  src:"Fonte: coletiva MEC · vídeo verificável · 09/10/2025", window:"09–13 out 2025", vol:61500, lat:4.0,
-  fea:{ver:"v1.2", analyst:"L. Barchini", date:"11/10/2025",
-    canon:"A declaração do ministro sobre a revisão da política de cotas no ensino superior",
-    scin:["a proposta de revisão","critérios de cotas","mérito da política de cotas"],
-    scout:["a pessoa do ministro","o governo em geral","outras falas do evento"],
-    crit:[{t:"f",q:"Revisar e ampliar faz sentido, cotas precisam de manutenção"},{t:"c",q:"Mexer em cota é retrocesso, não aceito"}],
-    disc:[["o ministro (pessoa)","41% do pico ataca o ministro, não a proposta — deslocamento alto"],["o governo Lula","veículo de disputa, não o objeto técnico"]]},
-  baseline:{neg:62,neu:22,pos:16}, stance:{con:34,mis:17,neu:20,fav:29},
-  desloc:{prog:30,gov:41,cel:23,neu:0,ruido:6, pct:41},
-  critica:{operacional:12,distributiva:30,merito:26,politico:32},
-  fac:[{k:"A",d:"genérico fixo (“cotas”)",rej:55,f1:0.54,base:1},{k:"B",d:"mensagem isolada (OTSD)",rej:47,f1:0.62,base:1},
-       {k:"C",d:"analista + FEA",rej:34,f1:0.78,base:0},{k:"D",d:"LLM + FEA",rej:37,f1:0.75,base:0}], gold:34,
-  bt:{acerto:"part"}},
+ {id:"EP-2025-01-ENEM-02", wi:24, series:"enem", peak:79, pol:"ENEM",
+  title:"Divulgação do resultado do ENEM 2024",
+  anchor:"Resultado individual do ENEM 2024 divulgado em 13 de janeiro de 2025.",
+  srcUrl:"https://agenciabrasil.ebc.com.br/educacao/noticia/2024-05/provas-do-enem-2024-serao-em-3-e-10-de-novembro-confira-o-cronograma",
+  srcLabel:"Agência Brasil — calendário e resultado do ENEM 2024", window:"13–15 jan 2025",
+  fea:{ver:"v1.1",analyst:"L. Barchini",date:"13/01/2025",
+   canon:"A divulgação e a correção das notas do resultado do ENEM 2024",
+   scin:["notas divulgadas","modelo de correção (TRI)","acesso ao resultado"],
+   scout:["seleção do SISU","governo federal","desempenho pessoal do usuário"],
+   crit:[{t:"c",q:"Tirei nota baixa na redação sem explicação, essa TRI é injusta"},{t:"f",q:"Gabaritei, muito feliz com minha nota!"}],
+   disc:[["o SISU","o pico é sobre a nota, não sobre a seleção que vem depois"],["o governo","presença marginal (20%)"]]},
+  baseline:{neg:60,neu:22,pos:18}, stance:{con:33,mis:16,neu:26,fav:25},
+  desloc:{prog:34,gov:20,cel:22,neu:18,ruido:6,pct:20},
+  critica:{operacional:40,distributiva:22,merito:20,politico:18},
+  fac:[{k:"A",d:"genérico fixo (“ENEM”)",rej:50,f1:0.57,base:1},{k:"B",d:"mensagem isolada (OTSD)",rej:42,f1:0.64,base:1},
+       {k:"C",d:"analista + FEA",rej:33,f1:0.80,base:0},{k:"D",d:"LLM + FEA",rej:35,f1:0.77,base:0}], gold:33, acerto:"ok"},
 
- {id:"EP-2025-11-ENEM-03", week:19, pol:"ENEM", title:"Anulação de questão e condução da aplicação do ENEM",
-  anchor:"Anúncio de anulação de questão após o primeiro dia de aplicação do ENEM 2025.",
-  src:"Fonte: nota oficial INEP · 09/11/2025", window:"09–12 nov 2025", vol:152000, lat:1.2,
-  fea:{ver:"v1.0", analyst:"L. Barchini", date:"10/11/2025",
-    canon:"A anulação de questão e a condução da aplicação do ENEM 2025 pelo INEP",
-    scin:["erro na questão anulada","logística da aplicação","comunicação do INEP"],
-    scout:["nível de dificuldade percebido","governo federal","reforma do ensino médio"],
-    crit:[{t:"c",q:"Anular questão no maior exame do país é vergonhoso"},{t:"f",q:"Corrigiram rápido e comunicaram, pelo menos isso"}],
-    disc:[["o governo Lula","24% desloca para o Executivo; alvo técnico é o INEP"],["a reforma do ensino médio","tema adjacente, fora da janela do pico"]]},
-  baseline:{neg:74,neu:14,pos:12}, stance:{con:63,mis:12,neu:17,fav:8},
-  desloc:{prog:58,gov:24,cel:0,neu:10,ruido:8, pct:24},
-  critica:{operacional:61,distributiva:8,merito:13,politico:18},
-  fac:[{k:"A",d:"genérico fixo (“ENEM”)",rej:70,f1:0.60,base:1},{k:"B",d:"mensagem isolada (OTSD)",rej:66,f1:0.68,base:1},
-       {k:"C",d:"analista + FEA",rej:63,f1:0.82,base:0},{k:"D",d:"LLM + FEA",rej:61,f1:0.79,base:0}], gold:63,
-  bt:{acerto:"ok"}},
-
- {id:"EP-2026-01-SISU-01", week:28, pol:"SISU", title:"Divulgação das notas de corte e resultado da chamada regular",
-  anchor:"Publicação do resultado da chamada regular do SISU 2026/1 e das notas de corte.",
-  src:"Fonte: MEC · Portal Único de Acesso · 27/01/2026", window:"27–30 jan 2026", vol:96800, lat:1.8,
-  fea:{ver:"v1.1", analyst:"L. Barchini", date:"28/01/2026",
-    canon:"As notas de corte e o resultado da chamada regular do SISU 2026/1",
-    scin:["notas de corte","concorrência por vaga","operação do sistema de seleção"],
-    scout:["frustração pessoal não dirigida","qualidade do curso","governo federal"],
-    crit:[{t:"c",q:"Nota de corte de medicina subindo todo ano, ninguém aguenta"},{t:"f",q:"Passei!! valeu SISU, sonho realizado"}],
-    disc:[["o mérito do ENEM","o pico é sobre seleção, não sobre o exame"],["o governo","presença marginal (12%)"]]},
-  baseline:{neg:58,neu:25,pos:17}, stance:{con:27,mis:18,neu:34,fav:21},
-  desloc:{prog:33,gov:12,cel:21,neu:29,ruido:5, pct:12},
+ {id:"EP-2025-01-SISU-01", wi:26, series:"sisu", peak:88, pol:"SISU",
+  title:"Notas de corte e resultado da chamada regular do SISU 2025",
+  anchor:"Notas de corte parciais em 18/01 e resultado da chamada regular do SISU 2025 em 26/01/2025 — 254.899 aprovados.",
+  srcUrl:"https://www.gov.br/mec/pt-br/assuntos/noticias/2025/janeiro/sisu-primeiras-notas-de-corte-ja-estao-disponiveis",
+  srcLabel:"MEC — notas de corte do SISU 2025", window:"18–26 jan 2025",
+  fea:{ver:"v1.1",analyst:"L. Barchini",date:"26/01/2025",
+   canon:"As notas de corte e o resultado da chamada regular do SISU 2025",
+   scin:["notas de corte","concorrência por vaga","operação do Portal Único"],
+   scout:["frustração pessoal não dirigida","qualidade do curso","governo federal"],
+   crit:[{t:"c",q:"Nota de corte de medicina subindo todo ano, ninguém aguenta"},{t:"f",q:"Passei em primeira chamada!! valeu SISU"}],
+   disc:[["o mérito do ENEM","o pico é sobre a seleção, não sobre o exame"],["o governo","presença marginal (12%)"]]},
+  baseline:{neg:57,neu:26,pos:17}, stance:{con:27,mis:18,neu:34,fav:21},
+  desloc:{prog:33,gov:12,cel:21,neu:29,ruido:5,pct:12},
   critica:{operacional:44,distributiva:24,merito:20,politico:12},
   fac:[{k:"A",d:"genérico fixo (“SISU”)",rej:45,f1:0.58,base:1},{k:"B",d:"mensagem isolada (OTSD)",rej:38,f1:0.66,base:1},
-       {k:"C",d:"analista + FEA",rej:27,f1:0.81,base:0},{k:"D",d:"LLM + FEA",rej:29,f1:0.78,base:0}], gold:27,
-  bt:{acerto:"ok"}},
+       {k:"C",d:"analista + FEA",rej:27,f1:0.81,base:0},{k:"D",d:"LLM + FEA",rej:29,f1:0.78,base:0}], gold:27, acerto:"ok"},
 
- {id:"EP-2026-02-PDM-01", week:32, pol:"Pé-de-Meia", title:"Decisão do TCU questiona a execução orçamentária do Pé-de-Meia",
-  anchor:"Acórdão do TCU aponta inconsistências na execução orçamentária do programa Pé-de-Meia.",
-  src:"Fonte: TCU · Acórdão · 12/02/2026", window:"12–16 fev 2026", vol:74200, lat:3.1,
-  fea:{ver:"v1.3", analyst:"L. Barchini", date:"13/02/2026",
-    canon:"A decisão do TCU que questiona a execução orçamentária do Pé-de-Meia",
-    scin:["execução orçamentária","fundamento jurídico da decisão","continuidade dos pagamentos"],
-    scout:["desenho do programa","valor do benefício","celebração de recebimento"],
-    crit:[{t:"c",q:"Se o TCU travar, quem paga o pato é o estudante pobre"},{t:"f",q:"Fiscalização é boa, dinheiro público tem que ser bem usado"}],
-    disc:[["o governo Lula","44% desloca a decisão para disputa Executivo × oposição"],["a Caixa","operadora, não é o objeto do acórdão"]]},
+ {id:"EP-2025-02-PDM-TCU", wi:29, series:"pdm", peak:85, pol:"Pé-de-Meia",
+  title:"TCU × Pé-de-Meia: bloqueio de recursos e liberação com prazo de 120 dias",
+  anchor:"Após o TCU (min. Nardes) bloquear ~R$6 bi do programa em janeiro, o Tribunal liberou os repasses em 13/02/2025 e deu 120 dias para adequação orçamentária.",
+  srcUrl:"https://portal.tcu.gov.br/imprensa/noticias/tcu-da-prazo-de-120-dias-para-governo-federal-adequar-programa-pe-de-meia-ao-orcamento",
+  srcLabel:"Portal TCU — prazo de 120 dias para o Pé-de-Meia", window:"09–16 fev 2025",
+  fea:{ver:"v1.3",analyst:"L. Barchini",date:"13/02/2025",
+   canon:"A decisão do TCU que bloqueou e depois liberou os recursos do Pé-de-Meia",
+   scin:["execução orçamentária do programa","fundamento da decisão do TCU","continuidade dos pagamentos"],
+   scout:["desenho do programa","valor do benefício","celebração de recebimento"],
+   crit:[{t:"c",q:"Se travar o Pé-de-Meia, quem paga o pato é o estudante pobre"},{t:"f",q:"Fiscalização é boa, dinheiro público tem que estar em ordem"}],
+   disc:[["o governo Lula","44% converte a decisão técnica em disputa Executivo × oposição"],["a Caixa","operadora, não é objeto do acórdão"]]},
   baseline:{neg:71,neu:16,pos:13}, stance:{con:54,mis:15,neu:19,fav:12},
-  desloc:{prog:41,gov:44,cel:9,neu:0,ruido:6, pct:44},
+  desloc:{prog:41,gov:44,cel:9,neu:0,ruido:6,pct:44},
   critica:{operacional:18,distributiva:20,merito:22,politico:40},
   fac:[{k:"A",d:"genérico fixo (“Pé-de-Meia”)",rej:68,f1:0.55,base:1},{k:"B",d:"mensagem isolada (OTSD)",rej:60,f1:0.63,base:1},
-       {k:"C",d:"analista + FEA",rej:54,f1:0.80,base:0},{k:"D",d:"LLM + FEA",rej:56,f1:0.77,base:0}], gold:54,
-  bt:{acerto:"part"}},
+       {k:"C",d:"analista + FEA",rej:54,f1:0.80,base:0},{k:"D",d:"LLM + FEA",rej:56,f1:0.77,base:0}], gold:54, acerto:"part"},
 
- {id:"EP-2026-03-PDM-02", week:37, pol:"Pé-de-Meia", title:"Pagamento da parcela de março do Pé-de-Meia aos estudantes",
-  anchor:"Liberação da parcela de março de 2026 do Pé-de-Meia; onda de relatos de recebimento.",
-  src:"Fonte: MEC/Caixa · calendário de pagamentos · 14/03/2026", window:"14–18 mar 2026", vol:128400, lat:2.5,
-  fea:{ver:"v1.2", analyst:"L. Barchini", date:"14/03/2026",
-    canon:"O pagamento da parcela de março de 2026 do Pé-de-Meia aos estudantes beneficiários",
-    scin:["liberação da parcela","calendário e valor","operação pela Caixa"],
-    scout:["desenho do programa","governo federal","disputa político-partidária","outras políticas do MEC"],
-    crit:[{t:"f",q:"Caiu o dinheiro hoje, ajudou demais aqui em casa 🙏"},{t:"c",q:"Isso é esmola eleitoreira, não resolve evasão nenhuma"}],
-    disc:[["o governo Lula","31% celebra ou ataca o governo — alvo é o repasse, não o Executivo"],["a Caixa Econômica","operadora do pagamento, não a política"],["o Pé-de-Meia como política","o pico é sobre a parcela concreta, não sobre o desenho"]]},
+ {id:"EP-2025-02-PDM-PAG", wi:30, series:"pdm", peak:100, pol:"Pé-de-Meia",
+  title:"Pagamento da parcela de R$ 1.000 do Pé-de-Meia aos concluintes",
+  anchor:"MEC iniciou em 25/02/2025 o pagamento da parcela de R$ 1.000 (+ R$ 200 do incentivo-Enem) aos estudantes, até 27/02; onda de relatos de recebimento.",
+  srcUrl:"https://agenciagov.ebc.com.br/noticias/202502/pagamentos-do-pe-de-meia-estao-garantidos-e-comecarao-em-25-2",
+  srcLabel:"Agência Gov — pagamentos do Pé-de-Meia a partir de 25/02", window:"23–28 fev 2025",
+  fea:{ver:"v1.2",analyst:"L. Barchini",date:"25/02/2025",
+   canon:"O pagamento da parcela de fevereiro de 2025 do Pé-de-Meia aos estudantes beneficiários",
+   scin:["liberação da parcela de R$ 1.000","calendário por mês de nascimento","operação pela Caixa"],
+   scout:["desenho do programa","governo federal","disputa político-partidária","decisão do TCU"],
+   crit:[{t:"f",q:"Caiu o dinheiro hoje, ajudou demais aqui em casa 🙏"},{t:"c",q:"Isso é esmola eleitoreira, não resolve evasão nenhuma"}],
+   disc:[["o governo Lula","31% celebra ou ataca o governo — o alvo é o repasse, não o Executivo"],["a Caixa Econômica","operadora do pagamento, não a política"],["o Pé-de-Meia como política","o pico é sobre a parcela concreta, não sobre o desenho"]]},
   baseline:{neg:67,neu:18,pos:15}, stance:{con:20,mis:12,neu:22,fav:46},
-  desloc:{prog:18,gov:31,cel:44,neu:0,ruido:7, pct:31},
+  desloc:{prog:18,gov:31,cel:44,neu:0,ruido:7,pct:31},
   critica:{operacional:26,distributiva:22,merito:14,politico:38},
   fac:[{k:"A",d:"genérico fixo (“Pé-de-Meia”)",rej:63,f1:0.52,base:1},{k:"B",d:"mensagem isolada (OTSD)",rej:51,f1:0.61,base:1},
-       {k:"C",d:"analista + FEA",rej:22,f1:0.79,base:0},{k:"D",d:"LLM + FEA",rej:25,f1:0.76,base:0}], gold:20,
-  bt:{acerto:"ok"}},
+       {k:"C",d:"analista + FEA",rej:22,f1:0.79,base:0},{k:"D",d:"LLM + FEA",rej:25,f1:0.76,base:0}], gold:20, acerto:"ok"},
 ];
+// pico não caracterizado (FEA pendente) — mostrado na série, sem episódio
+const PENDING=[{wi:51, series:"pdm", peak:69, label:"pico jul/2025 — FEA pendente"}];
 
-const STANCE_COLORS={con:"var(--con)",mis:"var(--mis)",neu:"var(--neu)",fav:"var(--fav)"};
-const STANCE_LAB={con:"Contrário",mis:"Misto",neu:"Neutro",fav:"Favorável"};
-const POL_COLORS={neg:"var(--con)",neu:"var(--neu)",pos:"var(--fav)"};
-const POL_LAB={neg:"Negativo",neu:"Neutro",pos:"Positivo"};
-const DES_COLORS={cel:"var(--fav)",prog:"var(--con)",gov:"var(--gov)",neu:"var(--neu)",ruido:"var(--line-2)"};
-const DES_LAB={cel:"Celebração / relato do benefício (favorável)",prog:"Crítica ao programa",
-  gov:"Alvo deslocado — crítica ao governo",neu:"Relato / dúvida neutra",ruido:"Ironia · ruído · off-topic"};
 const fmt=n=>n.toLocaleString("pt-BR");
 const $=s=>document.querySelector(s);
 
-// ---------- timeline ----------
-function buildSeries(){
-  const N=52, base=[], rnd=(s=>()=>((s=(s*9301+49297)%233280)/233280))(7);
-  for(let w=0;w<N;w++){
-    let v=3200+Math.sin(w/6)*700+rnd()*900;
-    EPS.forEach(e=>{ const d=w-e.week; v+=(e.vol/26)*Math.exp(-(d*d)/2.2); });
-    base.push(Math.max(1500,v));
-  }
-  return base;
-}
+// ---------- timeline (3 séries reais) ----------
+let TLGEO=null;
 function renderTimeline(){
-  const s=buildSeries(), W=1120,H=190, pl=8,pr=8,pt=14,pb=26;
-  const max=Math.max(...s), iw=W-pl-pr, ih=H-pt-pb;
-  const x=i=>pl+(i/(s.length-1))*iw, y=v=>pt+ih-(v/max)*ih;
-  let area=`M ${x(0)} ${y(s[0])}`, line=`M ${x(0)} ${y(s[0])}`;
-  for(let i=1;i<s.length;i++){area+=` L ${x(i)} ${y(s[i])}`;line+=` L ${x(i)} ${y(s[i])}`;}
-  area+=` L ${x(s.length-1)} ${pt+ih} L ${x(0)} ${pt+ih} Z`;
-  const months=["jul","ago","set","out","nov","dez","jan","fev","mar","abr","mai","jun"];
+  const W=1120,H=230, pl=34,pr=14,pt=16,pb=30;
+  const iw=W-pl-pr, ih=H-pt-pb, n=TRENDS.length;
+  const x=i=>pl+(i/(n-1))*iw, y=v=>pt+ih-(v/100)*ih;
+  TLGEO={x,y,pl,pr,pt,pb,iw,ih,W,H,n};
+  // gridlines 0/50/100
+  let grid="";
+  [0,50,100].forEach(g=>{const yy=y(g);
+    grid+=`<line x1="${pl}" y1="${yy}" x2="${W-pr}" y2="${yy}" stroke="var(--line)" stroke-width="1"/>`+
+          `<text x="${pl-8}" y="${yy+3.5}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="var(--mono)">${g}</text>`;});
+  // month ticks
+  const months=["ago/24","set","out","nov","dez","jan/25","fev","mar","abr","mai","jun","jul"];
   let ticks="";
-  months.forEach((m,i)=>{const xi=pl+((i*4.33)/(s.length-1))*iw;
-    ticks+=`<text x="${xi}" y="${H-8}" font-size="10.5" fill="var(--muted)" font-family="var(--mono)">${m}</text>`;});
+  months.forEach((m,i)=>{const xi=pl+((i*4.33)/(n-1))*iw;
+    ticks+=`<text x="${xi}" y="${H-8}" font-size="10" fill="var(--muted)" font-family="var(--mono)">${m}</text>`;});
+  // lines
+  let lines="";
+  SERIES.forEach(s=>{
+    let d="";
+    TRENDS.forEach((r,i)=>{ d+=(i?" L ":"M ")+x(i).toFixed(1)+" "+y(r[s.k]).toFixed(1); });
+    lines+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>`;
+  });
+  // pending markers (hollow)
+  let pend="";
+  PENDING.forEach(p=>{const xi=x(p.wi),yi=y(p.peak);
+    pend+=`<circle cx="${xi}" cy="${yi}" r="5.5" fill="var(--surface)" stroke="var(--pdm)" stroke-width="2" stroke-dasharray="2 2"/><title>${p.label}</title>`;});
+  // episode markers (filled, on its series)
   let dots="";
-  EPS.forEach((e,idx)=>{ const xi=x(e.week), yi=y(s[e.week]);
+  EPS.forEach((e,idx)=>{const col=SERIES.find(s=>s.k===e.series).color; const xi=x(e.wi),yi=y(e.peak);
     dots+=`<g class="tl-dot" data-idx="${idx}" style="cursor:pointer">
-      <line x1="${xi}" y1="${yi}" x2="${xi}" y2="${pt+ih}" stroke="var(--brand)" stroke-width="1" stroke-dasharray="2 3" opacity=".45"/>
-      <circle cx="${xi}" cy="${yi}" r="9" fill="var(--brand)" opacity="0.14"/>
-      <circle class="hit" cx="${xi}" cy="${yi}" r="6" fill="var(--brand)" stroke="var(--surface)" stroke-width="2"/>
-      <title>${e.id} — ${e.title}</title></g>`;
+      <circle cx="${xi}" cy="${yi}" r="9" fill="${col}" opacity="0.15"/>
+      <circle class="hit" cx="${xi}" cy="${yi}" r="6" fill="${col}" stroke="var(--surface)" stroke-width="2"/>
+      <title>${e.id} — ${e.title}</title></g>`;});
+  // hover guide + overlay
+  const guide=`<line id="tlguide" x1="0" y1="${pt}" x2="0" y2="${pt+ih}" stroke="var(--line-2)" stroke-width="1" opacity="0"/>`;
+  const overlay=`<rect id="tlover" x="${pl}" y="${pt}" width="${iw}" height="${ih}" fill="transparent"/>`;
+  $("#timeline").innerHTML=`<svg id="tlsvg" viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" role="img"
+    aria-label="Interesse de busca semanal (Google Trends) de ENEM, Pé-de-Meia e SISU, com episódios marcados">
+    ${grid}${ticks}${lines}${guide}${pend}${dots}${overlay}</svg>`;
+  $("#timeline").querySelectorAll(".tl-dot").forEach(g=>g.addEventListener("click",()=>select(+g.dataset.idx)));
+  const svg=$("#tlsvg"), over=$("#tlover"), guideEl=$("#tlguide"), tip=$("#tltip"), wrap=$("#tlwrap");
+  over.addEventListener("mousemove",ev=>{
+    const rect=svg.getBoundingClientRect(), sx=(ev.clientX-rect.left)/rect.width*W;
+    let i=Math.round((sx-pl)/iw*(n-1)); i=Math.max(0,Math.min(n-1,i));
+    const r=TRENDS[i], gx=x(i);
+    guideEl.setAttribute("x1",gx); guideEl.setAttribute("x2",gx); guideEl.setAttribute("opacity","1");
+    const dd=new Date(r.date+"T00:00"); const dstr=dd.toLocaleDateString("pt-BR",{day:"2-digit",month:"short",year:"2-digit"});
+    tip.innerHTML=`<div class="dt">semana de ${dstr}</div>`+
+      SERIES.map(s=>`<div class="rw"><span><i style="background:${s.color}"></i>${s.lab}</span><b>${r[s.k]}</b></div>`).join("");
+    const px=gx/W*wrap.clientWidth;
+    tip.style.left=Math.min(wrap.clientWidth-150, Math.max(4,px+10))+"px";
+    tip.style.top="8px"; tip.style.opacity="1";
   });
-  $("#timeline").innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" role="img"
-    aria-label="Série semanal de menções com 7 episódios marcados">
-    <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="var(--brand)" stop-opacity="0.22"/>
-      <stop offset="1" stop-color="var(--brand)" stop-opacity="0.02"/></linearGradient></defs>
-    <path d="${area}" fill="url(#ag)"/>
-    <path d="${line}" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linejoin="round"/>
-    ${ticks}${dots}</svg>`;
-  $("#timeline").querySelectorAll(".tl-dot").forEach(g=>{
-    g.addEventListener("click",()=>select(+g.dataset.idx));
-  });
+  over.addEventListener("mouseleave",()=>{guideEl.setAttribute("opacity","0"); tip.style.opacity="0";});
 }
 
 // ---------- chips ----------
 function renderChips(){
-  const c=$("#chips");
-  c.innerHTML=EPS.map((e,i)=>{
-    const dom=dominantPol(e);
+  $("#chips").innerHTML=EPS.map((e,i)=>{
+    const col=SERIES.find(s=>s.k===e.series).color;
     return `<button class="chip" role="tab" data-idx="${i}" aria-pressed="false">
-      <span class="cpol" style="background:${dom}"></span>
-      <span>${shortTitle(e)}</span>
-      <span class="cid">${e.id.split("-").slice(-2).join("-")}</span></button>`;
+      <span class="cpol" style="background:${col}"></span><span>${shortTitle(e)}</span>
+      <span class="cid">${e.id.split("-").slice(1,3).join("/")}</span></button>`;
   }).join("");
-  c.querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>select(+b.dataset.idx)));
+  document.querySelectorAll("#chips .chip").forEach(b=>b.addEventListener("click",()=>select(+b.dataset.idx)));
 }
 function shortTitle(e){
-  const map={"EP-2025-08-ENEM-01":"ENEM · edital redação","EP-2025-09-ENEM-02":"ENEM · sistema fora do ar",
-    "EP-2025-10-ESUP-01":"Ministro · cotas","EP-2025-11-ENEM-03":"ENEM · questão anulada",
-    "EP-2026-01-SISU-01":"SISU · notas de corte","EP-2026-02-PDM-01":"Pé-de-Meia · TCU",
-    "EP-2026-03-PDM-02":"Pé-de-Meia · pagamento"};
-  return map[e.id]||e.pol;
+  return {"EP-2024-11-ENEM-01":"ENEM · aplicação","EP-2025-01-ENEM-02":"ENEM · resultado",
+    "EP-2025-01-SISU-01":"SISU · notas de corte","EP-2025-02-PDM-TCU":"Pé-de-Meia · TCU",
+    "EP-2025-02-PDM-PAG":"Pé-de-Meia · pagamento"}[e.id]||e.pol;
 }
-function dominantPol(e){ return e.stance.fav>=e.stance.con?"var(--fav)":"var(--con)"; }
 
-// ---------- stacked bar helper ----------
-function stack(el,parts){ // parts: [{v,color,label,tcolor}]
+function stack(el,parts){
   const total=parts.reduce((a,p)=>a+p.v,0);
-  el.innerHTML=parts.filter(p=>p.v>0).map(p=>{
-    const w=(p.v/total*100);
-    return `<div class="seg" style="flex:${p.v} 0 0;background:${p.color}"
-      title="${p.label}: ${p.v}%"><span>${w>=9?p.v+"%":""}</span></div>`;
+  el.innerHTML=parts.filter(p=>p.v>0).map(p=>{const w=p.v/total*100;
+    return `<div class="seg" style="flex:${p.v} 0 0;background:${p.color}" title="${p.label}: ${p.v}%"><span>${w>=9?p.v+"%":""}</span></div>`;
   }).join("");
 }
+const DES_COLORS={cel:"var(--fav)",prog:"var(--con)",gov:"var(--gov)",neu:"var(--neu)",ruido:"var(--line-2)"};
+const DES_LAB={cel:"Celebração / relato do benefício (favorável)",prog:"Crítica ao programa",gov:"Alvo deslocado — crítica ao governo",neu:"Relato / dúvida neutra",ruido:"Ironia · ruído · off-topic"};
 
-// ---------- render selected ----------
 let cur=-1;
 function select(i){
   cur=i; const e=EPS[i];
-  document.querySelectorAll(".chip").forEach((b,j)=>b.setAttribute("aria-pressed", j===i));
-  // header
-  $("#ep-id").textContent=e.id;
-  $("#ep-title").textContent=e.title;
+  document.querySelectorAll("#chips .chip").forEach((b,j)=>b.setAttribute("aria-pressed", j===i));
+  $("#ep-id").textContent=e.id; $("#ep-title").textContent=e.title;
   $("#ep-anchor").textContent=e.anchor;
-  $("#ep-src").textContent=e.src;
-  $("#ep-window").textContent=e.window;
-  $("#ep-vol").textContent=fmt(e.vol);
-  $("#ep-lat").textContent=e.lat.toString().replace(".",",")+" h";
-  $("#ep-pol").textContent=e.pol;
-  // FEA
+  const a=$("#ep-src"); a.textContent=e.srcLabel; a.href=e.srcUrl;
+  $("#ep-window").textContent=e.window; $("#ep-peak").textContent=e.peak+" / 100"; $("#ep-pol").textContent=e.pol;
   $("#fea-ver").textContent=e.fea.ver;
   $("#fea-canon").textContent="“"+e.fea.canon+"”";
   $("#fea-in").innerHTML=e.fea.scin.map(x=>`<li>${x}</li>`).join("");
   $("#fea-out").innerHTML=e.fea.scout.map(x=>`<li>${x}</li>`).join("");
-  $("#fea-crit").innerHTML=e.fea.crit.map(x=>
-    `<div class="ex"><span class="badge ${x.t}">${x.t==="f"?"FAVORÁVEL":"CONTRÁRIO"}</span><q>${x.q}</q></div>`).join("");
-  $("#fea-disc").innerHTML=e.fea.disc.map(d=>
-    `<div class="d"><s>✕ ${d[0]}</s><span class="why">— ${d[1]}</span></div>`).join("");
-  $("#fea-analyst").textContent=e.fea.analyst;
-  $("#fea-date").textContent=e.fea.date;
-  $("#fea-epref").textContent=e.id;
-  // comparison bars
-  stack($("#bar-baseline"),[
-    {v:e.baseline.neg,color:"var(--con)",label:"Negativo"},
-    {v:e.baseline.neu,color:"var(--neu)",label:"Neutro"},
-    {v:e.baseline.pos,color:"var(--fav)",label:"Positivo"}]);
-  stack($("#bar-stance"),[
-    {v:e.stance.con,color:"var(--con)",label:"Contrário"},
-    {v:e.stance.mis,color:"var(--mis)",label:"Misto"},
-    {v:e.stance.neu,color:"var(--neu)",label:"Neutro"},
-    {v:e.stance.fav,color:"var(--fav)",label:"Favorável"}]);
-  $("#cmp-legend").innerHTML=[
-    ["var(--con)","Contrário / Negativo"],["var(--mis)","Misto"],
-    ["var(--neu)","Neutro"],["var(--fav)","Favorável / Positivo"]]
-    .map(([c,l])=>`<span><i style="background:${c}"></i>${l}</span>`).join("");
-  // callout
-  $("#c-appar").textContent=e.baseline.neg+"%";
-  $("#c-real").textContent=e.stance.con+"%";
-  $("#c-desc").textContent=e.desloc.pct+"%";
+  $("#fea-crit").innerHTML=e.fea.crit.map(x=>`<div class="ex"><span class="badge ${x.t}">${x.t==="f"?"FAVORÁVEL":"CONTRÁRIO"}</span><q>${x.q}</q></div>`).join("");
+  $("#fea-disc").innerHTML=e.fea.disc.map(d=>`<div class="d"><s>✕ ${d[0]}</s><span class="why">— ${d[1]}</span></div>`).join("");
+  $("#fea-analyst").textContent=e.fea.analyst; $("#fea-date").textContent=e.fea.date; $("#fea-epref").textContent=e.id;
+  stack($("#bar-baseline"),[{v:e.baseline.neg,color:"var(--con)",label:"Negativo"},{v:e.baseline.neu,color:"var(--neu)",label:"Neutro"},{v:e.baseline.pos,color:"var(--fav)",label:"Positivo"}]);
+  stack($("#bar-stance"),[{v:e.stance.con,color:"var(--con)",label:"Contrário"},{v:e.stance.mis,color:"var(--mis)",label:"Misto"},{v:e.stance.neu,color:"var(--neu)",label:"Neutro"},{v:e.stance.fav,color:"var(--fav)",label:"Favorável"}]);
+  $("#cmp-legend").innerHTML=[["var(--con)","Contrário / Negativo"],["var(--mis)","Misto"],["var(--neu)","Neutro"],["var(--fav)","Favorável / Positivo"]].map(([c,l])=>`<span><i style="background:${c}"></i>${l}</span>`).join("");
+  $("#c-appar").textContent=e.baseline.neg+"%"; $("#c-real").textContent=e.stance.con+"%"; $("#c-desc").textContent=e.desloc.pct+"%";
   const delta=e.baseline.neg-e.stance.con;
-  $("#c-delta").textContent=(delta>=0?"−":"+")+Math.abs(delta)+" p.p.";
-  $("#c-delta").style.color=delta>=0?"var(--fav)":"var(--con)";
-  $("#c-fav").textContent=e.stance.fav+"%";
-  $("#c-desloc").textContent=e.desloc.pct+"%";
-  // deslocamento
-  stack($("#bar-desloc"),[
-    {v:e.desloc.cel,color:DES_COLORS.cel,label:DES_LAB.cel},
-    {v:e.desloc.prog,color:DES_COLORS.prog,label:DES_LAB.prog},
-    {v:e.desloc.gov,color:DES_COLORS.gov,label:DES_LAB.gov},
-    {v:e.desloc.neu,color:DES_COLORS.neu,label:DES_LAB.neu},
-    {v:e.desloc.ruido,color:DES_COLORS.ruido,label:DES_LAB.ruido}]);
-  $("#desloc-legend").innerHTML=Object.keys(DES_LAB)
-    .filter(k=>e.desloc[k]>0)
-    .map(k=>`<span><i style="background:${DES_COLORS[k]}"></i>${DES_LAB[k]} · ${e.desloc[k]}%</span>`).join("");
-  // critica
-  const cmax=Math.max(...Object.values(e.critica));
+  $("#c-delta").textContent=(delta>=0?"−":"+")+Math.abs(delta)+" p.p."; $("#c-delta").style.color=delta>=0?"var(--fav)":"var(--con)";
+  $("#c-fav").textContent=e.stance.fav+"%"; $("#c-desloc").textContent=e.desloc.pct+"%";
+  stack($("#bar-desloc"),[{v:e.desloc.cel,color:DES_COLORS.cel,label:DES_LAB.cel},{v:e.desloc.prog,color:DES_COLORS.prog,label:DES_LAB.prog},{v:e.desloc.gov,color:DES_COLORS.gov,label:DES_LAB.gov},{v:e.desloc.neu,color:DES_COLORS.neu,label:DES_LAB.neu},{v:e.desloc.ruido,color:DES_COLORS.ruido,label:DES_LAB.ruido}]);
+  $("#desloc-legend").innerHTML=Object.keys(DES_LAB).filter(k=>e.desloc[k]>0).map(k=>`<span><i style="background:${DES_COLORS[k]}"></i>${DES_LAB[k]} · ${e.desloc[k]}%</span>`).join("");
   const clab={operacional:"Operacional",distributiva:"Distributiva",merito:"De mérito da política",politico:"Político-partidária"};
-  $("#critica").innerHTML=Object.keys(clab).map(k=>{
-    const v=e.critica[k];
-    return `<div class="hbar"><div class="hl">${clab[k]}</div>
-      <div class="track"><div class="fill" style="width:${v/cmax*100}%;background:var(--brand)"></div></div>
-      <div class="hv">${v}%</div></div>`;}).join("");
-  // factorial
+  const cmax=Math.max(...Object.values(e.critica));
+  $("#critica").innerHTML=Object.keys(clab).map(k=>{const v=e.critica[k];
+    return `<div class="hbar"><div class="hl">${clab[k]}</div><div class="track"><div class="fill" style="width:${v/cmax*100}%;background:var(--brand)"></div></div><div class="hv">${v}%</div></div>`;}).join("");
   const fmax=Math.max(...e.fac.map(f=>f.rej),e.gold)*1.12;
   $("#factorial").innerHTML=e.fac.map(f=>`
-    <div class="facbar">
-      <div class="fb-lab"><span class="code">${f.k}</span> <span class="desc">${f.d}</span></div>
+    <div class="facbar"><div class="fb-lab"><span class="code">${f.k}</span> <span class="desc">${f.d}</span></div>
       <div class="fb-track">
         <div class="fb-fill ${f.base?'base':'method'}" style="width:${f.rej/fmax*100}%">${f.rej}%</div>
         <div class="goldmark" style="left:${e.gold/fmax*100}%"></div>
         <div class="fb-f1" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);">F1 ${f.f1.toFixed(2).replace(".",",")}</div>
-      </div>
-    </div>`).join("");
-  // data table
+      </div></div>`).join("");
   $("#data-table").innerHTML=`<table>
     <tr><th>Categoria</th><th>Sem alvo (polaridade)</th><th>Com FEA (posicionamento)</th></tr>
     <tr><td>Contrário / Negativo</td><td>${e.baseline.neg}%</td><td>${e.stance.con}%</td></tr>
     <tr><td>Misto</td><td>—</td><td>${e.stance.mis}%</td></tr>
     <tr><td>Neutro</td><td>${e.baseline.neu}%</td><td>${e.stance.neu}%</td></tr>
     <tr><td>Favorável / Positivo</td><td>${e.baseline.pos}%</td><td>${e.stance.fav}%</td></tr>
-    <tr><td>Deslocamento de alvo</td><td colspan="2">${e.desloc.pct}% das manifestações têm alvo ≠ política nominal</td></tr>
-    </table>`;
+    <tr><td>Deslocamento de alvo</td><td colspan="2">${e.desloc.pct}% com alvo ≠ política nominal</td></tr></table>`;
 }
 
-// ---------- backtesting ----------
 function renderBacktest(){
   $("#bt-body").innerHTML=EPS.map((e,i)=>{
-    const pill=e.bt.acerto==="ok"
-      ?`<span class="pill ok">● correto</span>`
-      :`<span class="pill part">● parcial</span>`;
-    return `<tr data-jump="${i}">
-      <td><span class="code">${e.id.split("-").slice(-2).join("-")}</span></td>
-      <td>${e.anchor}</td><td>${e.pol}</td>
-      <td class="num">${fmt(e.vol)}</td>
-      <td class="num">${e.lat.toString().replace(".",",")} h</td>
-      <td class="num">${e.desloc.pct}%</td>
-      <td>${pill}</td></tr>`;
+    const pill=e.acerto==="ok"?`<span style="color:var(--fav);font-weight:600">● correto</span>`:`<span style="color:var(--mis);font-weight:600">● parcial</span>`;
+    const dstr=e.window;
+    return `<tr data-jump="${i}"><td><span class="code">${e.id}</span></td><td>${e.anchor}</td><td style="white-space:nowrap">${dstr}</td>
+      <td class="num">${e.peak}</td><td class="num">${e.desloc.pct}%</td>
+      <td><a href="${e.srcUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${e.srcLabel.split(" — ")[0]} ↗</a></td></tr>`;
   }).join("");
-  $("#bt-body").querySelectorAll("tr[data-jump]").forEach(tr=>{
-    tr.addEventListener("click",()=>{select(+tr.dataset.jump);
-      document.querySelector(".core").scrollIntoView({behavior:"smooth",block:"start"});});
-  });
+  document.querySelectorAll("#bt-body tr[data-jump]").forEach(tr=>tr.addEventListener("click",()=>{select(+tr.dataset.jump);document.querySelector(".core").scrollIntoView({behavior:"smooth",block:"start"});}));
 }
 
-// ---------- theme ----------
 $("#themeBtn").addEventListener("click",()=>{
-  const cur=document.documentElement.getAttribute("data-theme");
-  const dark=cur?cur==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  const c=document.documentElement.getAttribute("data-theme");
+  const dark=c?c==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
   document.documentElement.setAttribute("data-theme",dark?"light":"dark");
   renderTimeline();
 });
+window.addEventListener("resize",()=>{ /* svg is responsive via viewBox */ });
 
-renderTimeline();
-renderChips();
-renderBacktest();
-select(6); // Pé-de-Meia pagamento — o caso que prova a tese
+renderTimeline(); renderChips(); renderBacktest();
+select(4); // Pé-de-Meia pagamento — o caso que prova a tese
 </script>
 </body>
 </html>

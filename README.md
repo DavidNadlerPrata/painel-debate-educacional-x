@@ -32,7 +32,10 @@ Análise sempre agregada · vedado o perfilamento individual e qualquer inferên
 naturais identificáveis · minimização e pseudonimização desde a coleta · base legal e finalidade
 explícitas sob a LGPD. O painel diz o que o debate mostra sobre políticas, não sobre pessoas.
 
----
+## Conteúdo do repositório
 
-Página única, HTML autocontido, sem dependências externas. Abra o `index.html` no navegador
-ou acesse a versão publicada via GitHub Pages.
+- **`index.html`** — o painel: página única, HTML autocontido, sem dependências externas.
+  Abra no navegador ou acesse a versão publicada via GitHub Pages.
+- **`gerar_proposta.py`** — gera o documento Word da proposta da PoC
+  (`Proposta_PoC_Painel_Leonardo.docx`, ignorado pelo git) na mesma pasta do script.
+  Requer `python-docx` (`pip install python-docx`); rode com `python gerar_proposta.py`.

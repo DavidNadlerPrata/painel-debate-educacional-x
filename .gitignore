@@ -1,0 +1,4 @@
+# Ignora artefatos gerados
+Proposta_PoC_Painel_Leonardo.docx
+*.docx
+__pycache__/
